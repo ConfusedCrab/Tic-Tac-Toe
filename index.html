@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="effects.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Tic Tac Toe</h1>
+
+    <!-- Game Mode Buttons -->
+    <div class="mode-selection">
+      <button id="vs-computer-btn" class="btn btn-mode">Play vs Computer</button>
+    </div>
+
+    <!-- Score display -->
+    <div class="score-board">
+      <div class="score-container">
+        <span id="player-x-score" class="score-x">Player X: 0</span>
+        <span id="draws-score" class="score-draw">Draws: 0</span>
+        <span id="player-o-score" class="score-o">Player O: 0</span>
+      </div>
+    </div>
+
+    <!-- Game status -->
+    <div id="status" class="status">Next player: Player X (X)</div>
+
+    <!-- Game board -->
+    <div class="board">
+      <div class="square" data-index="0"></div>
+      <div class="square" data-index="1"></div>
+      <div class="square" data-index="2"></div>
+      <div class="square" data-index="3"></div>
+      <div class="square" data-index="4"></div>
+      <div class="square" data-index="5"></div>
+      <div class="square" data-index="6"></div>
+      <div class="square" data-index="7"></div>
+      <div class="square" data-index="8"></div>
+    </div>
+
+    <!-- Game controls -->
+    <div class="controls">
+      <button id="new-game" class="btn btn-primary">New Game</button>
+      <button id="change-names" class="btn btn-secondary">Change Names</button>
+      <button id="show-history" class="btn btn-secondary">Game History</button>
+    </div>
+
+    <!-- Name input panel -->
+    <div id="name-inputs" class="panel hidden">
+      <h3 class="panel-title">Player Names</h3>
+      
+      <div class="input-group">
+        <div class="input-field">
+          <label for="player-x-name">Player X</label>
+          <input type="text" id="player-x-name" value="Player X" />
+        </div>
+        <div class="input-field">
+          <label for="player-o-name">Player O</label>
+          <input type="text" id="player-o-name" value="Player O" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Game history panel -->
+    <div id="game-history" class="panel hidden">
+      <div class="panel-header">
+        <h3 class="panel-title">Game History</h3>
+        <button id="reset-all" class="btn btn-danger btn-small">Reset All</button>
+      </div>
+      <ul id="history-list" class="history-list">
+        <li class="empty-history">No games played yet</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="effects.js"></script>
+</body>
+</html>
