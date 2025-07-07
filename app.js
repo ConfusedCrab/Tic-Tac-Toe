@@ -155,6 +155,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function resetGame() {
+    stopFireworks(); //  stop the fire show
+
     // Reset game state
     squares = Array(9).fill(null);
     xIsNext = true;
@@ -256,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function toggleVsComputerMode() {
+    stopFireworks(); // 🔥 stop the fire show
     isVsComputer = !isVsComputer;
     vsComputerBtn.textContent = isVsComputer ? 'Switch to PvP' : 'Play vs Computer';
     resetGame();

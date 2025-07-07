@@ -8,15 +8,18 @@ function confettiEffect() {
     confetti.style.height = '100vh';
     confetti.style.pointerEvents = 'none';
     confetti.style.zIndex = '9999';
-
+    
     const emojis = ['🎉', '✨', '🎊', '🥳', '⭐', '💫'];
     const count = 80;   // More confetti
-
-        // Append 
+    
+    // Append 
     document.body.appendChild(confetti);
-
+    
     // Spread confetti creation across time
     let created = 0;
+    
+    // calling victory sound 
+    playWinSound();
 
     function addConfettiChunk() {
         const chunkSize = 10;
@@ -32,7 +35,7 @@ function confettiEffect() {
             span.style.transform = `translateY(0) rotate(0deg)`;
             confetti.appendChild(span);
 
-                   // Animate drop
+            // Animate drop
             setTimeout(() => {
                 const rotate = 180 + Math.random() * 360;
                 const translateY = 85 + Math.random() * 25;
@@ -42,14 +45,14 @@ function confettiEffect() {
             }, 50);
         }
 
-            
+
         created += chunkSize;
         if (created < count) {
             requestAnimationFrame(addConfettiChunk); // smooth batching
         }
     }
 
-// Victory label
+    // Victory label
     //   const label = document.createElement('div');
     //  label.textContent = `🎉 ${winner === 'X' ? playerXName : playerOName} Wins! 🎉`;
     //   label.style.position = 'fixed';
@@ -81,9 +84,8 @@ function confettiEffect() {
         fireworksEffect();
     }, 300); // small buffer to avoid same-frame spike
 
-    playWinSound();
 
-     // Remove everything after a bit
+    // Remove everything after a bit
     setTimeout(() => {
         confetti.remove();
         // label.remove();
@@ -92,32 +94,78 @@ function confettiEffect() {
 
 
 // fire crackers
+let fireworksInterval = null;
+
 function fireworksEffect() {
     const fireworks = document.createElement('div');
     fireworks.className = 'fireworks';
 
-     // Append 
+    fireworks.id = 'persistent-fireworks';  //  ID 
+
+    // Append
     document.body.appendChild(fireworks);
 
+    // firecrackers colour
     const vibrantColors = ['#ff0055', '#ffcc00', '#00ffd5', '#00ff44', '#ff00ff', '#00bfff'];
 
-     // Generate sparkles
-    for (let i = 0; i < 25; i++) {  // more dots
+    function launchFirework() {
+        //    for (let i = 0; i < 25; i++) {
         const dot = document.createElement('div');
         dot.className = 'firework-dot';
         dot.style.left = `${Math.random() * 100}vw`;
         dot.style.top = `${Math.random() * 100}vh`;
-        dot.style.backgroundColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
-        dot.style.boxShadow = `0 0 10px ${dot.style.backgroundColor}, 0 0 20px ${dot.style.backgroundColor}`;
+        const color = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+        dot.style.backgroundColor = color;
+        dot.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
         fireworks.appendChild(dot);
+
+        //  spark live a bit, then fade
+        setTimeout(() => {
+            dot.style.opacity = 0;
+            dot.style.transition = 'opacity 1s ease-out';
+        }, 1000);
+
+        // Remove after animation
+        setTimeout(() => {
+            dot.remove();
+        }, 2000);   // Fade each dot after 2s
+
+        // }
+    }
+    function burst() {
+        const burstCount = Math.floor(Math.random() * 5) + 3;
+        for (let i = 0; i < burstCount; i++) {
+            setTimeout(() => {
+                launchFirework();
+            }, i * 200); // staggered spark
+        }
     }
 
-    // Remove after animation
-    setTimeout(() => {
-        fireworks.remove();
-    }, 4000);
+    //  FIRST BURST IMMEDIATELY!
+    burst();
 
+    //  Continuous bursts every 1.5 seconds
+    if (!fireworksInterval) {
+        fireworksInterval = setInterval(burst, 1500);
+    }
+
+    
 }
+
+// stops the fireworks
+function stopFireworks() {
+    const fireworks = document.getElementById('persistent-fireworks');
+    if (fireworks) {
+        fireworks.remove();
+    }
+
+    if (fireworksInterval) {
+        clearInterval(fireworksInterval);
+        fireworksInterval = null;
+    }
+}
+
+
 // winning sound effect
 function playWinSound() {
     if (!window.winAudio) return;
