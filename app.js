@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
   let winningLine = null;
   let gameOver = false;
   let isVsComputer = false;
+  let aiMakingMove = false;
+
 
   // --- Player Info ---
   let playerXName = 'Player X';
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function handleSquareClick(square) {
     const index = square.dataset.index;
     // Return if square is already filled or game is over
-    if (squares[index] || gameOver) return;
+    if (squares[index] || gameOver || (isVsComputer && !xIsNext && !aiMakingMove)) return;
     // Update game state
     squares[index] = xIsNext ? 'X' : 'O';
     // Update UI
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // It's a draw
       gameOver = true;
       scores.draw++;
-      shakeBoard();   //animation
+      showDrawEffect(boardEl, squareEls);    //animation
       saveGameHistory(null);    // saving result
     } else {
       // Switch turns
@@ -103,14 +105,104 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // computer moves
-  function makeComputerMove() {
-    let emptyIndices = squares.map((val, i) => val === null ? i : null).filter(v => v !== null);
-    if (emptyIndices.length === 0) return;
+function makeComputerMove() {
+  aiMakingMove = true; // Allow AI to "click"
 
-    let randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-    let square = squareEls[randomIndex];
+  let difficulty = document.getElementById('difficulty').value;
+  let emptyIndices = squares.map((val, i) => val === null ? i : null).filter(i => i !== null);
+  if (emptyIndices.length === 0) {
+    aiMakingMove = false;
+    return;
+  }
+
+  let bestMove;
+
+  switch (difficulty) {
+    case 'easy':
+      bestMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      break;
+
+    case 'medium':
+      bestMove = findBestImmediateMove('O') || findBestImmediateMove('X') ||
+        emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      break;
+
+    case 'hard':
+      bestMove = minimax(squares, 'O').index;
+      break;
+  }
+
+  if (bestMove != null) {
+    let square = squareEls[bestMove];
     handleSquareClick(square);
   }
+
+  aiMakingMove = false; // Done with AI move
+}
+
+  // mediam mode 
+  function findBestImmediateMove(player) {
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === null) {
+        squares[i] = player;
+        let win = checkWinner(squares);  //  pass the current state
+        squares[i] = null;
+        if (win === player) return i;
+      }
+    }
+    return null;
+  }
+  // hard mode 
+  function minimax(newBoard, player) {
+    const availSpots = newBoard.map((v, i) => v === null ? i : null).filter(i => i !== null);
+    const opponent = player === 'O' ? 'X' : 'O';
+
+    const winner = checkWinner(newBoard);
+    if (winner === 'O') return { score: 10 };
+    if (winner === 'X') return { score: -10 };
+    if (availSpots.length === 0) return { score: 0 };
+
+    let moves = [];
+
+    for (let i = 0; i < availSpots.length; i++) {
+      let index = availSpots[i];
+      let move = {};
+      move.index = index;
+      newBoard[index] = player;
+
+      let result = minimax(newBoard, opponent);
+      move.score = result.score;
+
+      newBoard[index] = null;
+      moves.push(move);
+    }
+
+    let bestMove;
+    if (player === 'O') {
+      let bestScore = -Infinity;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score > bestScore) {
+          bestScore = moves[i].score;
+          bestMove = moves[i];
+        }
+      }
+    } else {
+      let bestScore = Infinity;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score < bestScore) {
+          bestScore = moves[i].score;
+          bestMove = moves[i];
+        }
+      }
+    }
+
+    return bestMove;
+  }
+
+  function checkWinner(sq) {
+  const result = calculateWinner(sq);
+  return result ? result.winner : null;
+}
 
   function calculateWinner(sq) {
     const lines = [
@@ -257,10 +349,19 @@ document.addEventListener('DOMContentLoaded', function () {
     gameHistory = gameHistory.slice(0, 10);
   }
 
+  // toggle between modes 
   function toggleVsComputerMode() {
-    stopFireworks(); // 🔥 stop the fire show
+    stopFireworks(); // Stop the fire show
     isVsComputer = !isVsComputer;
+
+    // Update button text
     vsComputerBtn.textContent = isVsComputer ? 'Switch to PvP' : 'Play vs Computer';
+
+    // Toggle difficulty dropdown visibility
+    const difficultyToggle = document.getElementById('difficulty-toggle');
+    difficultyToggle.style.display = isVsComputer ? 'flex' : 'none';
+
+    // Reset game
     resetGame();
   }
 

@@ -1,3 +1,5 @@
+// winning effect
+
 // emoji effect 
 function confettiEffect() {
     const confetti = document.createElement('div');
@@ -8,16 +10,16 @@ function confettiEffect() {
     confetti.style.height = '100vh';
     confetti.style.pointerEvents = 'none';
     confetti.style.zIndex = '9999';
-    
+
     const emojis = ['🎉', '✨', '🎊', '🥳', '⭐', '💫'];
     const count = 80;   // More confetti
-    
+
     // Append 
     document.body.appendChild(confetti);
-    
+
     // Spread confetti creation across time
     let created = 0;
-    
+
     // calling victory sound 
     playWinSound();
 
@@ -149,7 +151,7 @@ function fireworksEffect() {
         fireworksInterval = setInterval(burst, 1500);
     }
 
-    
+
 }
 
 // stops the fireworks
@@ -182,3 +184,18 @@ function playWinSound() {
         console.warn('Win sound error:', e);
     }
 }
+
+// on draw
+function showDrawEffect(boardEl, squareEls) {
+    boardEl.classList.add('draw-shake');
+
+    squareEls.forEach(sq => {
+        sq.classList.add('draw-glow');
+    });
+
+    setTimeout(() => {
+        boardEl.classList.remove('draw-shake');
+        squareEls.forEach(sq => sq.classList.remove('draw-glow'));
+    }, 1000);
+}
+
