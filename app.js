@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', function () {
   window.winAudio = new Audio('assets/audio/win-sound.mp3');
   winAudio.volume = 0.7;
   winAudio.preload = 'auto';//  it ensures loaded early
-
+  
+  // for draw sound effect rest part in effect.js 
+ window.drawSound = new Audio('assets/audio/draw.mp3'); 
+ winAudio.volume = 0.7;
+  winAudio.preload = 'auto';//  it ensures loaded early
   // Init
   initGame();
   function initGame() {
@@ -88,8 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
       // It's a draw
       gameOver = true;
       scores.draw++;
-      showDrawEffect(boardEl, squareEls);    //animation
-      saveGameHistory(null);    // saving result
+
+      saveGameHistory(null);          // saving result
+      drawEffect(boardEl, squareEls);           //animation
     } else {
       // Switch turns
       xIsNext = !xIsNext;
@@ -105,40 +110,40 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // computer moves
-function makeComputerMove() {
-  aiMakingMove = true; // Allow AI to "click"
+  function makeComputerMove() {
+    aiMakingMove = true; // Allow AI to "click"
 
-  let difficulty = document.getElementById('difficulty').value;
-  let emptyIndices = squares.map((val, i) => val === null ? i : null).filter(i => i !== null);
-  if (emptyIndices.length === 0) {
-    aiMakingMove = false;
-    return;
+    let difficulty = document.getElementById('difficulty').value;
+    let emptyIndices = squares.map((val, i) => val === null ? i : null).filter(i => i !== null);
+    if (emptyIndices.length === 0) {
+      aiMakingMove = false;
+      return;
+    }
+
+    let bestMove;
+
+    switch (difficulty) {
+      case 'easy':
+        bestMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        break;
+
+      case 'medium':
+        bestMove = findBestImmediateMove('O') || findBestImmediateMove('X') ||
+          emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        break;
+
+      case 'hard':
+        bestMove = minimax(squares, 'O').index;
+        break;
+    }
+
+    if (bestMove != null) {
+      let square = squareEls[bestMove];
+      handleSquareClick(square);
+    }
+
+    aiMakingMove = false; // Done with AI move
   }
-
-  let bestMove;
-
-  switch (difficulty) {
-    case 'easy':
-      bestMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-      break;
-
-    case 'medium':
-      bestMove = findBestImmediateMove('O') || findBestImmediateMove('X') ||
-        emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-      break;
-
-    case 'hard':
-      bestMove = minimax(squares, 'O').index;
-      break;
-  }
-
-  if (bestMove != null) {
-    let square = squareEls[bestMove];
-    handleSquareClick(square);
-  }
-
-  aiMakingMove = false; // Done with AI move
-}
 
   // mediam mode 
   function findBestImmediateMove(player) {
@@ -200,20 +205,15 @@ function makeComputerMove() {
   }
 
   function checkWinner(sq) {
-  const result = calculateWinner(sq);
-  return result ? result.winner : null;
-}
+    const result = calculateWinner(sq);
+    return result ? result.winner : null;
+  }
 
   function calculateWinner(sq) {
     const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
+      [0,1,2],[3,4,5],[6,7,8], // rows
+        [0,3,6],[1,4,7],[2,5,8], // cols
+        [0,4,8],[2,4,6]          // diags
     ];
     for (let [a, b, c] of lines) {
       if (sq[a] &&
@@ -255,12 +255,20 @@ function makeComputerMove() {
     winner = null;
     winningLine = null;
     gameOver = false;
+    console.log("Reset called!");
+
     // Reset UI
     squareEls.forEach(sq => {
       sq.textContent = '';
       sq.className = 'square';
+      sq.style.animationDelay = '';
+      sq.style.visibility = ''; //  make sure square reappears
     });
     updateStatus();
+    boardEl.classList.remove('shake');
+    boardEl.classList.remove('draw-pop');
+    boardEl.style.display = 'grid';
+    newGameBtn.style.display = 'inline-block';
   }
 
   function resetScores() {

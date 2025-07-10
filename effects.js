@@ -2,6 +2,8 @@
 
 // emoji effect 
 function confettiEffect() {
+     // calling victory sound 
+    playWinSound();
     const confetti = document.createElement('div');
     confetti.style.position = 'fixed';
     confetti.style.left = '0';
@@ -186,16 +188,66 @@ function playWinSound() {
 }
 
 // on draw
-function showDrawEffect(boardEl, squareEls) {
-    boardEl.classList.add('draw-shake');
+function drawEffect(boardEl,squareEls) {
+          // Pick one random cell from each row to fall   (cell drop effect )
+      const fallIndices = [
+        Math.floor(Math.random() * 3), // row 1: 0,1,2
+        3 + Math.floor(Math.random() * 3), // row 2: 3,4,5
+        6 + Math.floor(Math.random() * 3)  // row 3: 6,7,8
+      ];
 
-    squareEls.forEach(sq => {
-        sq.classList.add('draw-glow');
-    });
+      boardEl.classList.add('impact-shake');
+      
+      setTimeout(() => {
+        boardEl.classList.remove('impact-shake');
+        squareEls.forEach((square, i) => {
+          if (fallIndices.includes(i)) {
+            square.style.animationDelay = '0s';
+            square.classList.add('pop-out');
+          } else {
+            square.style.animationDelay = '';
+            square.classList.remove('pop-out');
+          }
+        });
+      
+        boardEl.classList.add('draw-pop');
+      
+        setTimeout(() => {
+          boardEl.classList.remove('draw-pop');
+          squareEls.forEach((square, i) => {
+            if (fallIndices.includes(i)) {
+              square.textContent = '';
+              square.style.animationDelay = '';
+              square.style.visibility = 'hidden';
+              square.classList.remove('pop-out');
+            } else {
+              square.style.visibility = '';
+            }
+          });
 
-    setTimeout(() => {
-        boardEl.classList.remove('draw-shake');
-        squareEls.forEach(sq => sq.classList.remove('draw-glow'));
-    }, 1000);
+            gameActive = false;
+        }, 1200);
+      }, 300);
 }
+
+// // draw sound effect
+// function playDrawSound() {
+//     if (!window.drawSound) {
+//         console.warn('drawSound not defined on window.');
+//         return;
+//     }
+
+//     try {
+//         window.drawSound.currentTime = 0; // rewind
+//         window.drawSound.play();
+
+//         setTimeout(() => {
+//             window.drawSound.pause();    // Stop playback
+//             window.drawSound.currentTime = 0;  // Reset audio to start
+//         }, 4000); // stop after 4 sec
+//     } catch (e) {
+//         console.warn('Draw sound error:', e);
+//     }
+// }
+
 
