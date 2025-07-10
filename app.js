@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
   window.winAudio = new Audio('assets/audio/win-sound.mp3');
   winAudio.volume = 0.7;
   winAudio.preload = 'auto';//  it ensures loaded early
-  
+
   // for draw sound effect rest part in effect.js 
- window.drawSound = new Audio('assets/audio/draw.mp3'); 
- winAudio.volume = 0.7;
+  window.drawSound = new Audio('assets/audio/draw.mp3');
+  winAudio.volume = 0.7;
   winAudio.preload = 'auto';//  it ensures loaded early
   // Init
   initGame();
@@ -70,13 +70,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function handleSquareClick(square) {
     const index = square.dataset.index;
+    
     // Return if square is already filled or game is over
     if (squares[index] || gameOver || (isVsComputer && !xIsNext && !aiMakingMove)) return;
+    
     // Update game state
     squares[index] = xIsNext ? 'X' : 'O';
+    
     // Update UI
     square.textContent = squares[index];
     square.classList.add(squares[index].toLowerCase());
+    
     // Check for winner
     const result = calculateWinner(squares);
     if (result) {
@@ -85,9 +89,28 @@ document.addEventListener('DOMContentLoaded', function () {
       gameOver = true;
       // Update scores and history
       scores[winner]++;
-      showWinEffect();           //animation
+
+      // Only celebrate if player wins (not AI)
+      if (
+        (!isVsComputer) ||                            // PvP mode
+        (isVsComputer && winner === 'X')              // Player X beat AI
+      ) {
+        showWinEffect();  // 🎉 Celebrate
+      }
+        
+      // checks and call lose animation
+      if (isVsComputer && winner === 'O') {
+        boardEl.classList.add('shake');  //  animation
+        
+        //  remove the shake class after it runs, to allow re-shaking
+        setTimeout(() => {
+          boardEl.classList.remove('shake');
+        }, 500);
+      }
+      
       highlightWinningSquares();    //animation
       saveGameHistory(winner);        //saving result
+    
     } else if (squares.every(sq => sq !== null)) {
       // It's a draw
       gameOver = true;
@@ -211,9 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function calculateWinner(sq) {
     const lines = [
-      [0,1,2],[3,4,5],[6,7,8], // rows
-        [0,3,6],[1,4,7],[2,5,8], // cols
-        [0,4,8],[2,4,6]          // diags
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
+      [0, 4, 8], [2, 4, 6]          // diags
     ];
     for (let [a, b, c] of lines) {
       if (sq[a] &&
