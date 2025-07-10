@@ -2,7 +2,7 @@
 
 // emoji effect 
 function confettiEffect() {
-     // calling victory sound 
+    // calling victory sound 
     playWinSound();
     const confetti = document.createElement('div');
     confetti.style.position = 'fixed';
@@ -188,46 +188,49 @@ function playWinSound() {
 }
 
 // on draw
-function drawEffect(boardEl,squareEls) {
-          // Pick one random cell from each row to fall   (cell drop effect )
-      const fallIndices = [
+function drawEffect(boardEl, squareEls) {
+
+    // playDrawSound();
+
+    // Pick one random cell from each row to fall   (cell drop effect )
+    const fallIndices = [
         Math.floor(Math.random() * 3), // row 1: 0,1,2
         3 + Math.floor(Math.random() * 3), // row 2: 3,4,5
         6 + Math.floor(Math.random() * 3)  // row 3: 6,7,8
-      ];
+    ];
 
-      boardEl.classList.add('impact-shake');
-      
-      setTimeout(() => {
+    boardEl.classList.add('impact-shake');
+
+    setTimeout(() => {
         boardEl.classList.remove('impact-shake');
         squareEls.forEach((square, i) => {
-          if (fallIndices.includes(i)) {
-            square.style.animationDelay = '0s';
-            square.classList.add('pop-out');
-          } else {
-            square.style.animationDelay = '';
-            square.classList.remove('pop-out');
-          }
-        });
-      
-        boardEl.classList.add('draw-pop');
-      
-        setTimeout(() => {
-          boardEl.classList.remove('draw-pop');
-          squareEls.forEach((square, i) => {
             if (fallIndices.includes(i)) {
-              square.textContent = '';
-              square.style.animationDelay = '';
-              square.style.visibility = 'hidden';
-              square.classList.remove('pop-out');
+                square.style.animationDelay = '0s';
+                square.classList.add('pop-out');
             } else {
-              square.style.visibility = '';
+                square.style.animationDelay = '';
+                square.classList.remove('pop-out');
             }
-          });
+        });
+
+        boardEl.classList.add('draw-pop');
+
+        setTimeout(() => {
+            boardEl.classList.remove('draw-pop');
+            squareEls.forEach((square, i) => {
+                if (fallIndices.includes(i)) {
+                    square.textContent = '';
+                    square.style.animationDelay = '';
+                    square.style.visibility = 'hidden';
+                    square.classList.remove('pop-out');
+                } else {
+                    square.style.visibility = '';
+                }
+            });
 
             gameActive = false;
         }, 1200);
-      }, 300);
+    }, 300);
 }
 
 // // draw sound effect
@@ -247,6 +250,27 @@ function drawEffect(boardEl,squareEls) {
 //         }, 4000); // stop after 4 sec
 //     } catch (e) {
 //         console.warn('Draw sound error:', e);
+//     }
+// }
+
+
+// // lose sound effect
+// function playloseSound() {
+//     if (!window.loseSound) {
+//         console.warn('loseSound not defined on window.');
+//         return;
+//     }
+
+//     try {
+//         window.loseSound.currentTime = 0; // rewind
+//         window.loseSound.play();
+
+//         setTimeout(() => {
+//             window.loseSound.pause();    // Stop playback
+//             window.loseSound.currentTime = 0;  // Reset audio to start
+//         }, 4000); // stop after 4 sec
+//     } catch (e) {
+//         console.warn('lose sound error:', e);
 //     }
 // }
 

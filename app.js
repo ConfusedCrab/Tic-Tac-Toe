@@ -44,10 +44,30 @@ document.addEventListener('DOMContentLoaded', function () {
   winAudio.volume = 0.7;
   winAudio.preload = 'auto';//  it ensures loaded early
 
-  // for draw sound effect rest part in effect.js 
-  window.drawSound = new Audio('assets/audio/draw.mp3');
-  winAudio.volume = 0.7;
-  winAudio.preload = 'auto';//  it ensures loaded early
+  //   // for draw sound effect rest part in effect.js 
+  //   window.drawSound = new Audio('assets/audio/draw.mp3');
+  //   drawSound.volume = 0.7;
+  //   drawSound.preload = 'auto';//  it ensures loaded early
+
+  //   // for lose sound effect rest part in effect.js 
+  // window.loseSound = new Audio('assets/audio/lose.mp3');
+  // loseSound.volume = 0.6;
+  // loseSound.preload = 'auto';
+
+  // Taunts message List
+  const tauntMessages = [
+    "Nice try, human 🤖",
+    "Try again, fleshbag 💀",
+    "Ouch. That was too easy 🤖",
+    "Zeroes and ones > your brain 🧠",
+    "I'll be nice next time... maybe 🥱",
+    "Not even close. Classic human move 😒",
+    "You sure you're trying? 😂",
+    "Reboot your brain and try again 🧠🔋",
+    "You're lucky I'm in easy mode 🐣",
+    "Next time, bring a challenge 😎"
+  ];
+
   // Init
   initGame();
   function initGame() {
@@ -70,17 +90,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function handleSquareClick(square) {
     const index = square.dataset.index;
-    
+
     // Return if square is already filled or game is over
     if (squares[index] || gameOver || (isVsComputer && !xIsNext && !aiMakingMove)) return;
-    
+
     // Update game state
     squares[index] = xIsNext ? 'X' : 'O';
-    
+
     // Update UI
     square.textContent = squares[index];
     square.classList.add(squares[index].toLowerCase());
-    
+
     // Check for winner
     const result = calculateWinner(squares);
     if (result) {
@@ -97,20 +117,31 @@ document.addEventListener('DOMContentLoaded', function () {
       ) {
         showWinEffect();  // 🎉 Celebrate
       }
-        
+
       // checks and call lose animation
       if (isVsComputer && winner === 'O') {
         boardEl.classList.add('shake');  //  animation
-        
+
+        playloseSound();  //sound effect 
+
         //  remove the shake class after it runs, to allow re-shaking
         setTimeout(() => {
           boardEl.classList.remove('shake');
         }, 500);
+
+        //         try {
+        //   window.loseSound.currentTime = 0;
+        //   window.loseSound.play();
+        // } catch (e) {
+        //   console.warn('Lose sound error:', e);
+        // }
+        //  this line to taunt the player
+        showTauntMessage(); // No message passed = random insult
       }
-      
+
       highlightWinningSquares();    //animation
       saveGameHistory(winner);        //saving result
-    
+
     } else if (squares.every(sq => sq !== null)) {
       // It's a draw
       gameOver = true;
@@ -335,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
     drawsScoreEl.textContent = `Draws: ${scores.draw}`;
   }
 
+  // open change name button
   function toggleNameInputs() {
     const show = nameInputsEl.classList.contains('hidden');
     nameInputsEl.classList.toggle('hidden', !show);
@@ -343,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showHistoryBtn.textContent = 'Game History';
   }
 
+  // open game history
   function toggleGameHistory() {
     const show = gameHistoryEl.classList.contains('hidden');
     gameHistoryEl.classList.toggle('hidden', !show);
@@ -382,7 +415,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // toggle between modes 
   function toggleVsComputerMode() {
+    console.log("Mode changed!");
+
+
     stopFireworks(); // Stop the fire show
+
+
     isVsComputer = !isVsComputer;
 
     // Update button text
@@ -392,8 +430,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const difficultyToggle = document.getElementById('difficulty-toggle');
     difficultyToggle.style.display = isVsComputer ? 'flex' : 'none';
 
+    //  Reset just the scores 
+    scores = {
+      X: 0,
+      O: 0,
+      draw: 0
+    };
+    console.log("score reseted to 0 ");
+    updateScores(); //  Refresh the UI
     // Reset game
     resetGame();
+  }
+
+  // message
+  function showTauntMessage(message) {
+    const toast = document.getElementById('taunt-toast');
+    if (!toast) return;
+
+    // If no specific message passed, pick a random one
+    const msg = message || tauntMessages[Math.floor(Math.random() * tauntMessages.length)];
+
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    toast.classList.add('show');
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.classList.add('hidden'), 400);
+    }, 2500);
   }
 
 });
