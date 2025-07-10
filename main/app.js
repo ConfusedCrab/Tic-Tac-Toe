@@ -74,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
     "You just got outplayed by a tutorial 😎",
     "That wasn’t a game. That was a free lesson",
     "Hope you kept the receipt for that strategy. It’s broken.",
-    "This wasn’t a win. This was a mercy kill. 💀"
+    "This wasn’t a win. This was a mercy kill. 💀",
+    "You just opened the center. Rookie mistake."
   ];
 
   // Init
