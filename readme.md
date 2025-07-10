@@ -7,7 +7,14 @@ Whether it's victory, a draw, or defeat — this game *reacts*.
 Because every move should matter.
 
 ---
+## Technologies Used
 
+HTML5 – For semantic structure of the game board and layout
+CSS3 – For styling, animations (draw pop, shake, pop-out), and responsive design
+JavaScript (ES6) – Core game logic, win/draw detection, UI interactivity
+Responsive Design – Works on mobile, tablet, and desktop
+
+---
 ##  Features
 
 -  Classic 3x3 Tic Tac Toe game logic
