@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let gameOver = false;
   let isVsComputer = false;
   let aiMakingMove = false;
+  let currentPlayer = 'X';
 
 
   // --- Player Info ---
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- DOM Elements ---
   const boardEl = document.querySelector('.board');
   const squareEls = document.querySelectorAll('.square');
-  const statusEl = document.getElementById('status');
+  const statusDisplay = document.getElementById('status');
   const playerXScoreEl = document.getElementById('player-x-score');
   const playerOScoreEl = document.getElementById('player-o-score');
   const drawsScoreEl = document.getElementById('draws-score');
@@ -65,7 +66,15 @@ document.addEventListener('DOMContentLoaded', function () {
     "You sure you're trying? 😂",
     "Reboot your brain and try again 🧠🔋",
     "You're lucky I'm in easy mode 🐣",
-    "Next time, bring a challenge 😎"
+    "Next time, bring a challenge 😎",
+    "Next time, try using both hands. 🫠",
+    "Was that your strategy, or a cry for help? 😬",
+    "You call that a move? I've seen toddlers plan better",
+    "Bro brought a spoon to a gunfight 🍽️🔫",
+    "You just got outplayed by a tutorial 😎",
+    "That wasn’t a game. That was a free lesson",
+    "Hope you kept the receipt for that strategy. It’s broken.",
+    "This wasn’t a win. This was a mercy kill. 💀"
   ];
 
   // Init
@@ -103,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Check for winner
     const result = calculateWinner(squares);
+
     if (result) {
       winner = result.winner;
       winningLine = result.line;
@@ -116,17 +126,19 @@ document.addEventListener('DOMContentLoaded', function () {
         (isVsComputer && winner === 'X')              // Player X beat AI
       ) {
         showWinEffect();  // 🎉 Celebrate
+        setStatus('🏆', `Player ${winner} wins!`);
       }
 
       // checks and call lose animation
       if (isVsComputer && winner === 'O') {
         boardEl.classList.add('shake');  //  animation
 
-        playloseSound();  //sound effect 
+        // playloseSound();  //sound effect 
 
         //  remove the shake class after it runs, to allow re-shaking
         setTimeout(() => {
           boardEl.classList.remove('shake');
+          setStatus('🤖', 'Computer wins!');
         }, 500);
 
         //         try {
@@ -146,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // It's a draw
       gameOver = true;
       scores.draw++;
-
+      setStatus('🤝', "It's a draw!");
       saveGameHistory(null);          // saving result
       drawEffect(boardEl, squareEls);           //animation
     } else {
@@ -158,9 +170,17 @@ document.addEventListener('DOMContentLoaded', function () {
     updateScores();
     updateGameHistory();
 
-    if (!gameOver && isVsComputer && !xIsNext) {
-      setTimeout(makeComputerMove, 500);
+    if (!gameOver) {
+      if (isVsComputer && !xIsNext) {
+        currentPlayer = 'O';
+        setStatus('⏳', "Computer's turn...");
+        setTimeout(makeComputerMove, 500);
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        setStatus('⏳', `Player ${currentPlayer}'s turn`);
+      }
     }
+
   }
 
   // computer moves
@@ -348,16 +368,33 @@ document.addEventListener('DOMContentLoaded', function () {
     updateScores();
   }
 
+  function setStatus(icon, text = '') {
+    statusDisplay.textContent = `${icon} ${text}`;
+  }
+
   function updateStatus() {
+    if (!gameOver) return; // don't update after game ends
+
     if (winner) {
-      statusEl.textContent = `Winner: ${winner === 'X' ? playerXName : playerOName}`;
+      if (isVsComputer && winner === 'O') {
+        setStatus('🤖', 'Computer wins!');
+      } else {
+        setStatus('🏆', `Player ${winner} wins!`);
+      }
     } else if (gameOver) {
-      statusEl.textContent = "It's a draw!";
+      setStatus('🤝', "It's a draw!");
     } else {
-      const nextPlayer = xIsNext ? playerXName : playerOName;
-      const symbol = xIsNext ? 'X' : 'O';
-      statusEl.textContent = `Next player: ${nextPlayer} (${symbol})`;
+      if (isVsComputer) {
+        if (currentPlayer === 'O') {
+          setStatus('⏳', "Computer's turn...");
+        } else {
+          setStatus('⏳', `Your turn (X)`);
+        }
+      } else {
+        setStatus('⏳', `Next player: Player ${currentPlayer} (${currentPlayer})`);
+      }
     }
+
   }
 
   function updateScores() {

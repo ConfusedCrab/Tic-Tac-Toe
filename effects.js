@@ -189,7 +189,6 @@ function playWinSound() {
 
 // on draw
 function drawEffect(boardEl, squareEls) {
-
     // playDrawSound();
 
     // Pick one random cell from each row to fall   (cell drop effect )
